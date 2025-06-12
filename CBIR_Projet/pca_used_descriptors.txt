@@ -1,0 +1,4 @@
+rgb
+hsv
+lbp
+glcm

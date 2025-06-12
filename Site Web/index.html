@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CBIR – Recherche d'Images par Contenu</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
+
+  <style>
+    /* Définition des variables CSS (couleurs, transitions) */
+    :root {
+      --clr-primary: #3f72af;       /* Couleur primaire */
+      --clr-secondary: #112d4e;     /* Couleur secondaire */
+      --clr-accent: #0abde3;        /* Couleur d'accentuation */
+      --clr-light: #e9ecef;         /* Couleur claire */
+      --clr-dark: #212529;          /* Couleur foncée */
+      --transition: 0.3s;           /* Durée de la transition */
+    }
+
+    /* Styles pour le thème sombre */
+    [data-theme="dark"] {
+      --clr-light: #1f2a3a;
+      --clr-dark: #f8f9fa;
+      --clr-secondary: #3f72af;
+      --clr-accent: #0abde3;
+    }
+
+    /* Activation du scroll fluide */
+    * { scroll-behavior: smooth; }
+
+    /* Styles généraux du corps de la page */
+    body {
+      font-family: 'Poppins', sans-serif; /* Police de caractères */
+      background: var(--clr-light);        /* Couleur de fond */
+      color: var(--clr-dark);           /* Couleur du texte */
+      margin: 0;                       /* Suppression des marges par défaut */
+    }
+
+    /* Styles de la barre de navigation */
+    .navbar {
+      background: var(--clr-secondary); /* Couleur de fond */
+      padding: 1rem 2rem;            /* Espacement intérieur */
+    }
+
+    /* Styles des éléments de la barre de navigation (marque, liens) */
+    .navbar-brand, .nav-link {
+      color: var(--clr-light) !important; /* Couleur du texte */
+      font-weight: 500;             /* Épaisseur de la police */
+      transition: color var(--transition); /* Transition de couleur */
+    }
+
+    /* Style des liens de la barre de navigation au survol */
+    .nav-link:hover {
+      color: var(--clr-accent) !important; /* Couleur au survol */
+    }
+
+    /* Style de l'icône de changement de thème */
+    .theme-toggle {
+      cursor: pointer;             /* Curseur de type pointeur */
+      font-size: 1.25rem;           /* Taille de la police */
+    }
+
+    /* Styles de la section "Hero" (section d'accueil) */
+    .hero {
+      background: linear-gradient(135deg, var(--clr-primary), var(--clr-secondary)); /* Dégradé de couleurs */
+      color: white;                   /* Couleur du texte */
+      text-align: center;            /* Alignement du texte au centre */
+      padding: 6rem 1rem;            /* Espacement intérieur */
+      overflow: hidden;             /* Masquer le contenu dépassant */
+    }
+
+    /* Styles du titre dans la section "Hero" */
+    .hero h1 {
+      font-size: 2.75rem;           /* Taille de la police */
+      font-weight: 700;             /* Épaisseur de la police */
+      margin-bottom: 1rem;          /* Espacement en dessous */
+    }
+
+    /* Styles du paragraphe dans la section "Hero" */
+    .hero p {
+      font-size: 1.25rem;           /* Taille de la police */
+      margin-bottom: 2rem;          /* Espacement en dessous */
+    }
+
+    /* Styles des boutons principaux */
+    .btn-primary {
+      background: var(--clr-accent); /* Couleur de fond */
+      border: none;                /* Suppression de la bordure */
+      color: var(--clr-secondary);    /* Couleur du texte */
+      font-weight: 600;             /* Épaisseur de la police */
+      padding: .75rem 1.5rem;       /* Espacement intérieur */
+      transition: background var(--transition); /* Transition de couleur de fond */
+    }
+
+    /* Style des boutons principaux au survol */
+    .btn-primary:hover {
+      background: rgba(10, 189, 227, 0.8); /* Couleur de fond au survol (légèrement transparent) */
+    }
+
+    /* Styles généraux des sections */
+    section {
+      padding: 4rem 1rem;            /* Espacement intérieur */
+    }
+
+    /* Styles du titre des sections */
+    .section-title {
+      font-weight: 700;             /* Épaisseur de la police */
+      margin-bottom: 2rem;          /* Espacement en dessous */
+      position: relative;          /* Positionnement relatif */
+      display: inline-block;       /* Affichage en ligne */
+    }
+
+    /* Ajout d'une icône "étincelle" après le titre des sections */
+    .section-title::after {
+      content: '✨';               /* Contenu de l'icône */
+      margin-left: 8px;            /* Espacement à gauche */
+      font-size: 1rem;             /* Taille de la police */
+      position: relative;          /* Positionnement relatif */
+      top: 2px;                  /* Positionnement vertical */
+    }
+
+    /* Styles des cartes "feature" */
+    .feature-card {
+      border: none;                /* Suppression de la bordure */
+      border-radius: 1rem;         /* Rayon de la bordure */
+      transition: transform var(--transition), box-shadow var(--transition); /* Transitions */
+    }
+
+    /* Style des cartes "feature" au survol */
+    .feature-card:hover {
+      transform: translateY(-5px);  /* Déplacement vertical */
+      box-shadow: 0 6px 18px rgba(0,0,0,0.1); /* Ombre portée */
+    }
+
+    /* Styles des cartes "testimonial" */
+    .testimonial-card {
+      border-radius: 1rem;         /* Rayon de la bordure */
+      background: var(--clr-light);        /* Couleur de fond */
+      padding: 2rem;               /* Espacement intérieur */
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05); /* Ombre portée */
+      transition: transform var(--transition); /* Transition */
+    }
+
+    /* Style des cartes "testimonial" au survol */
+    .testimonial-card:hover {
+      transform: translateY(-5px);  /* Déplacement vertical */
+    }
+
+    /* Styles des fonds d'accentuation des cartes "testimonial" */
+    #testimonials .testimonial-card:nth-child(1) { background: rgba(10,189,227,0.1); } /* Première carte */
+    #testimonials .testimonial-card:nth-child(2) { background: rgba(255,193,7,0.1); }  /* Deuxième carte */
+    #testimonials .testimonial-card:nth-child(3) { background: rgba(76,175,80,0.1); }  /* Troisième carte */
+
+    /* Styles du pied de page */
+    .footer {
+      background: var(--clr-secondary); /* Couleur de fond */
+      color: var(--clr-light);           /* Couleur du texte */
+      text-align: center;            /* Alignement du texte au centre */
+      padding: 2rem 1rem;            /* Espacement intérieur */
+    }
+
+    /* Styles des liens dans le pied de page */
+    .footer a {
+      color: var(--clr-accent);        /* Couleur du texte */
+      text-decoration: none;        /* Suppression du soulignement */
+    }
+
+    /* Style des liens dans le pied de page au survol */
+    .footer a:hover {
+      text-decoration: underline;  /* Ajout du soulignement */
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg fixed-top">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#home">🚀 CBIR 🌙</a> <div class="d-flex align-items-center">
+        <button id="toggleTheme" aria-label="Activer le thème sombre" class="theme-toggle me-3">
+  <i id="themeIcon" class="fas fa-moon"></i>
+</button>
+      </div>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="#features">🔍 Fonctionnalités</a></li>
+          <li class="nav-item"><a class="nav-link" href="#overview">🎨 Aperçu</a></li>
+          <li class="nav-item"><a class="nav-link" href="#demo">🛠️ Comment ça marche</a></li>
+          <li class="nav-item"><a class="nav-link" href="#testimonials">💬 Avis</a></li>
+          <li class="nav-item"><a class="nav-link" href="#contact">✉️ Contact</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <header class="hero" id="home" data-aos="fade-up">
+    <h1>📸 Outil Ultime de Recherche d'Images par Contenu</h1>
+    <p>Indexez, cherchez et analysez vos images en un clin d'œil 😊</p>
+    <div>
+      <a href="#features" class="btn btn-primary btn-lg me-2">Découvrir ✨</a>
+      <a href="http://localhost:8000/download/gui" target="_blank" class="btn btn-outline-light btn-lg">Essayer Maintenant 🎉</a>
+    </div>
+  </header>
+
+  <main>
+    <section id="features">
+      <div class="container" data-aos="fade-right">
+        <h2 class="section-title">Fonctionnalités Clés</h2>
+        <div class="row g-4">
+          <div class="col-md-4" data-aos="zoom-in" data-aos-delay="100">
+            <div class="card feature-card text-center p-4">
+              <i class="fas fa-search fa-3x mb-3 text-primary"></i>
+              <h5 class="fw-bold">🔎 Recherche Visuelle</h5>
+              <p>Trouvez instantanément des images similaires basées sur couleur, texture et forme.</p>
+            </div>
+          </div>
+          <div class="col-md-4" data-aos="zoom-in" data-aos-delay="200">
+            <div class="card feature-card text-center p-4">
+              <i class="fas fa-chart-pie fa-3x mb-3 text-primary"></i>
+              <h5 class="fw-bold">📊 Analyse & Graphes</h5>
+              <p>Affichez histogrammes HSV/RGB et vecteurs caractéristiques pour chaque image.</p>
+            </div>
+          </div>
+          <div class="col-md-4" data-aos="zoom-in" data-aos-delay="300">
+            <div class="card feature-card text-center p-4">
+              <i class="fas fa-layer-group fa-3x mb-3 text-primary"></i>
+              <h5 class="fw-bold">🧠 Classement Intelligent</h5>
+              <p>Organisez vos résultats par similarité ou catégories prédéfinies.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+   <section id="overview" data-aos="fade-left">
+  <div class="container">
+    <h2 class="section-title">Aperçu de l'Interface ✨</h2>
+    <div class="row align-items-center g-4">
+
+      <!-- Colonne gauche : 3 captures très larges -->
+      <div class="col-lg-6" data-aos="fade-up" data-aos-delay="100">
+        <div class="row g-3 justify-content-center">
+          
+          <div class="col-auto">
+            <div class="card shadow rounded" style="width: 500px;">
+              <img 
+                src="img/gui_step1.png" 
+                alt="Importation de la requête" 
+                class="img-fluid rounded-top" />
+            </div>
+            <p class="text-center mt-1 fs-5">📥 Importation</p>
+          </div>
+
+          <div class="col-auto">
+            <div class="card shadow rounded" style="width: 500px;">
+              <img 
+                src="img/gui_step2.png" 
+                alt="Affichage des résultats" 
+                class="img-fluid rounded-top" />
+            </div>
+            <p class="text-center mt-1 fs-5">🔍 Résultats</p>
+          </div>
+
+          <div class="col-auto">
+            <div class="card shadow rounded" style="width: 500px;">
+              <img 
+                src="img/gui_step3.png" 
+                alt="Histogrammes et clustering" 
+                class="img-fluid rounded-top" />
+            </div>
+            <p class="text-center mt-1 fs-5">📊 Histogrammes & Clustering</p>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Colonne droite : liste descriptive agrandie -->
+      <div class="col-lg-6" data-aos="fade-up" data-aos-delay="200">
+        <ul class="list-unstyled fs-4">
+          <li class="mb-3">🏠 <strong>Dashboard</strong> : capture de votre interface principale.</li>
+          <li class="mb-3">🔍 <strong>Importation & Recherche</strong> : sélection descripteurs, distance et lancement.</li>
+          <li class="mb-3">📈 <strong>Histogrammes & Clustering</strong> : visualisation des caractéristiques et regroupements.</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+
+<section id="demo" data-aos="fade-up">
+  <div class="container">
+    <h2 class="section-title">✨ Comment ça marche 🍂✨</h2>
+    <p>Prenons un exemple avec une image d'automne… 🎃</p>
+
+    <div class="row gy-4 align-items-center mb-5">
+      <div class="col-md-4 text-center" data-aos="zoom-in">
+        <img src="img/reference.jpg"
+             alt="Chemin en forêt d'automne" class="img-fluid rounded shadow mb-2"/>
+        <p><strong>🍁 Image de référence</strong></p>
+      </div>
+      <div class="col-md-8">
+        <canvas id="histogram-canvas" height="150"></canvas>
+        <small class="d-block text-center">📊 Histogramme HSV de l’image</small>
+      </div>
+    </div>
+
+    <div class="row gy-3 justify-content-center mb-5">
+      <div class="col-md-5">
+        <label for="weight-color" class="form-label">🌈 Poids couleur</label>
+        <input type="range" id="weight-color" class="form-range" min="0" max="1" step="0.1" value="0.7">
+      </div>
+      <div class="col-md-5">
+        <label for="weight-texture" class="form-label">🧶 Poids texture</label>
+        <input type="range" id="weight-texture" class="form-range" min="0" max="1" step="0.1" value="0.3">
+      </div>
+    </div>
+
+    <div class="row gy-4 align-items-center">
+      <div class="col-md-8">
+        <div class="row g-3">
+          <div class="col-6 col-lg-4 text-center">
+            <img src="img/leaf.jpg" alt="Feuille en gros plan" class="img-fluid rounded shadow mb-1"/>
+            <p>🍃 Feuille en gros plan</p>
+          </div>
+          <div class="col-6 col-lg-4 text-center">
+            <img src="img/mist.jpg" alt="Arbres dans la brume" class="img-fluid rounded shadow mb-1"/>
+            <p>🌲 Arbres dans la brume</p>
+          </div>
+          <div class="col-6 col-lg-4 text-center mt-3 mt-lg-0">
+            <img src="img/bark.jpg" alt="Écorce d'arbre" class="img-fluid rounded shadow mb-1"/>
+            <p>🌳 Écorce d’arbre</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 text-center">
+        <canvas id="cluster-canvas" height="200"></canvas>
+        <small class="d-block">🔗 Clustering hiérarchique</small>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="testimonials" data-aos="fade-up">
+  <div class="container">
+    <h2 class="section-title">Avis Utilisateurs</h2>
+    <div class="row g-4">
+      <div class="col-md-4" data-aos="flip-left">
+        <div class="testimonial-card">
+          <p>« CBIR a transformé notre façon de chercher des images, c'est rapide et précis ! » 😊</p>
+          <footer class="blockquote-footer mt-3">Alice Martin, Photographe</footer>
+        </div>
+      </div>
+      <div class="col-md-4" data-aos="flip-left">
+        <div class="testimonial-card">
+          <p>« L'analyse de texture et couleur est bluffante, un must pour tout graphiste ! » 🎨</p>
+          <footer class="blockquote-footer mt-3">Jean Dubois, Designer</footer>
+        </div>
+      </div>
+      <div class="col-md-4" data-aos="flip-left">
+        <div class="testimonial-card">
+          <p>« Intégration facile et interface intuitive, je recommande chaudement. » 🚀</p>
+          <footer class="blockquote-footer mt-3">Sophie Laurent, Développeuse</footer>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="contact" data-aos="fade-up">
+  <div class="container">
+    <h2 class="section-title">Contactez-nous</h2>
+    <form class="row g-3">
+      <div class="col-md-6">
+        <label for="name" class="form-label">Nom 😊</label>
+        <input id="name" class="form-control" placeholder="Votre nom" required>
+      </div>
+      <div class="col-md-6">
+        <label for="email" class="form-label">Email 📧</label>
+        <input id="email" type="email" class="form-control" placeholder="Votre email" required>
+      </div>
+      <div class="col-12">
+        <label for="message" class="form-label">Message 💬</label>
+        <textarea id="message" class="form-control" rows="5" placeholder="Votre message" required></textarea>
+      </div>
+      <div class="col-12 text-center">
+        <button class="btn btn-primary btn-lg" type="submit">Envoyer 🚀</button>
+      </div>
+    </form>
+  </div>
+</section>
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <p>© 2025 – Projet L2D – CBIR | <a href="#">Mentions Légales</a> | <a href="#">Politique de confidentialité</a></p>
+    <div class="mt-2">
+      <a href="#">🐦</a>
+      <a href="#" class="ms-3">🔗</a>
+      <a href="#" class="ms-3">💻</a>
+    </div>
+  </div>
+</footer>
+
+<script src="https://kit.fontawesome.com/a2e0f3b8d3.js" crossorigin="anonymous"></script> <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script> <script>AOS.init({ once: true, duration: 800 });</script> <script>
+  // Toggle thème clair/sombre avec persistance
+  document.addEventListener('DOMContentLoaded', () => {
+    const toggleBtn = document.getElementById('toggleTheme');
+    const icon = document.getElementById('themeIcon');
+    const root = document.documentElement;
+    const storageKey = 'theme';
+
+    // Fonction de changement de thème
+    function setTheme(theme) {
+      root.setAttribute('data-theme', theme);
+      if (theme === 'dark') {
+        icon.classList.replace('fa-moon', 'fa-sun');
+        toggleBtn.setAttribute('aria-label', 'Activer le thème clair');
+      } else {
+        icon.classList.replace('fa-sun', 'fa-moon');
+        toggleBtn.setAttribute('aria-label', 'Activer le thème sombre');
+      }
+    }
+
+    // Initialisation du thème
+    const saved = localStorage.getItem(storageKey);
+    if (saved) setTheme(saved);
+    else setTheme(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+
+    // Événement click
+    toggleBtn.addEventListener('click', () => {
+      const current = root.getAttribute('data-theme');
+      const next = current === 'dark' ? 'light' : 'dark';
+      setTheme(next);
+      localStorage.setItem(storageKey, next);
+    });
+  });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <script>
+  // Histogramme HSV fictif
+  const histoCtx = document.getElementById('histogram-canvas').getContext('2d'); // Sélection du canvas pour l'histogramme
+  new Chart(histoCtx, { // Création d'un nouveau graphique Chart.js
+    type: 'bar', // Type de graphique : bar (histogramme)
+    data: { // Données du graphique
+      labels: ['H', 'S', 'V'], // Labels pour Hue, Saturation, Value
+      datasets: [{ label: 'Histogramme', data: [30, 70, 50] }] // Données fictives de l'histogramme
+    },
+    options: { responsive: true, plugins: { legend: { display: false } } } // Options du graphique (responsive, pas de légende)
+  });
+
+  // Dendrogramme simulé
+  const clusterCtx = document.getElementById('cluster-canvas').getContext('2d'); // Sélection du canvas pour le dendrogramme
+  new Chart(clusterCtx, { // Création d'un nouveau graphique Chart.js
+    type: 'line', // Type de graphique : line (pour simuler un dendrogramme)
+    data: { // Données du graphique
+      labels: ['Img A', 'Img B', 'Img C', 'Img D'], // Labels pour les images
+      datasets: [{ label: 'Distance', data: [0, 20, 40, 80], fill: false, tension: 0.4 }] // Données fictives des distances
+    },
+    options: { responsive: true, plugins: { legend: { display: false } } } // Options du graphique (responsive, pas de légende)
+  });
+</script>
+</body>
+
+</html>
