@@ -1,0 +1,18 @@
+from PyQt6.QtGui import QPalette, QColor
+
+theme_dark = False
+
+def apply_theme(window, toggle=False):
+    global theme_dark
+    if toggle:
+        theme_dark = not theme_dark
+
+    palette = QPalette()
+    if theme_dark:
+        palette.setColor(QPalette.ColorRole.Window, QColor(30, 30, 30))
+        palette.setColor(QPalette.ColorRole.WindowText, QColor(220, 220, 220))
+    else:
+        palette.setColor(QPalette.ColorRole.Window, QColor(240, 240, 240))
+        palette.setColor(QPalette.ColorRole.WindowText, QColor(0, 0, 0))
+
+    window.setPalette(palette)
