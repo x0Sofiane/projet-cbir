@@ -1,0 +1,58 @@
+from PyQt6.QtWidgets import QMainWindow, QPushButton, QVBoxLayout, QWidget
+from settings import apply_theme
+from file_manager import FileManager
+from history import HistoryWidget
+from graph_view import GraphView
+
+class MainWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("CBIR - Système de Recherche d'Images")
+        self.setGeometry(100, 100, 1200, 800)
+
+        self.central_widget = QWidget()
+        self.setCentralWidget(self.central_widget)
+        self.layout = QVBoxLayout()
+        self.central_widget.setLayout(self.layout)
+
+        # Boutons principaux
+        self.import_button = QPushButton("Importer une Image")
+        self.history_button = QPushButton("Voir l'Historique")
+        self.graph_button = QPushButton("Afficher les Graphes")
+        self.theme_button = QPushButton("Changer le Thème")
+
+        # Ajout des boutons à l'interface
+        self.layout.addWidget(self.import_button)
+        self.layout.addWidget(self.history_button)
+        self.layout.addWidget(self.graph_button)
+        self.layout.addWidget(self.theme_button)
+
+        # Connexions des événements
+        self.import_button.clicked.connect(self.import_image)
+        self.history_button.clicked.connect(self.show_history)
+        self.graph_button.clicked.connect(self.show_graphs)
+        self.theme_button.clicked.connect(self.toggle_theme)
+
+        # Modules
+        self.file_manager = FileManager()
+        self.history_widget = HistoryWidget()
+        self.graph_view = GraphView()
+
+        # Appliquer le thème initial
+        apply_theme(self)
+
+    def import_image(self):
+        """Ouvre le gestionnaire de fichiers pour importer une image"""
+        self.file_manager.open_file_dialog()
+
+    def show_history(self):
+        """Affiche l'historique des recherches"""
+        self.history_widget.show()
+
+    def show_graphs(self):
+        """Affiche les graphes d'analyse"""
+        self.graph_view.show()
+
+    def toggle_theme(self):
+        """Change entre le mode clair et sombre"""
+        apply_theme(self, toggle=True)

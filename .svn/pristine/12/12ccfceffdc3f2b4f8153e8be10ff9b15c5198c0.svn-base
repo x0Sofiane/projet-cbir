@@ -1,0 +1,112 @@
+from PyQt6.QtWidgets import (
+    QApplication, QWidget, QLabel, QPushButton, QVBoxLayout, QHBoxLayout,
+    QCheckBox, QGroupBox, QFileDialog
+)
+from PyQt6.QtGui import QPixmap
+from PyQt6.QtCore import Qt
+import numpy as np
+import cv2
+import sys
+
+class ImageSearchApp(QWidget):
+    def __init__(self):
+        super().__init__()
+
+        self.setWindowTitle("Recherche d'images")
+        self.setGeometry(100, 100, 1000, 600)
+        self.setStyleSheet("background-color: #1E1E1E; color: white;")
+
+        main_layout = QHBoxLayout(self)
+        main_layout.addWidget(self.create_param_panel())
+        main_layout.addWidget(self.create_search_panel())
+        
+        self.setLayout(main_layout)
+
+    def create_param_panel(self):
+        panel = QWidget()
+        panel.setFixedWidth(300)
+        layout = QVBoxLayout()
+
+        # Indexation
+        indexation_box = QGroupBox("Indexation")
+        indexation_layout = QVBoxLayout()
+        indexation_layout.addWidget(QLabel("- Ajout ou retrait d'images"))
+        indexation_box.setLayout(indexation_layout)
+        
+        # Affichage
+        display_box = QGroupBox("Affichage")
+        display_layout = QVBoxLayout()
+        display_layout.addWidget(QLabel("- Histogrammes colorimétriques"))
+        display_layout.addWidget(QLabel("- Histogrammes en niveaux de gris"))
+        display_box.setLayout(display_layout)
+        
+        # Filtrage
+        filter_box = QGroupBox("Filtrage")
+        filter_layout = QVBoxLayout()
+        self.color_checkbox = QCheckBox("Couleurs")
+        self.texture_checkbox = QCheckBox("Textures")
+        self.shape_checkbox = QCheckBox("Formes")
+        self.cnn_checkbox = QCheckBox("CNN")
+        
+        for checkbox in [self.color_checkbox, self.texture_checkbox, self.shape_checkbox, self.cnn_checkbox]:
+            filter_layout.addWidget(checkbox)
+        filter_box.setLayout(filter_layout)
+        
+        layout.addWidget(indexation_box)
+        layout.addWidget(display_box)
+        layout.addWidget(filter_box)
+        layout.addStretch()
+        panel.setLayout(layout)
+        
+        return panel
+    
+    def create_search_panel(self):
+        panel = QWidget()
+        layout = QVBoxLayout()
+
+        self.characteristics_label = QLabel("Caractéristiques")
+        self.characteristics_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.characteristics_label.setStyleSheet("background-color: black; padding: 20px; border: 1px solid gray;")
+        layout.addWidget(self.characteristics_label)
+
+        self.image_placeholder = QLabel("+")
+        self.image_placeholder.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.image_placeholder.setStyleSheet("background-color: #333; padding: 40px; font-size: 24px; border: 1px solid gray;")
+        self.image_placeholder.mousePressEvent = self.load_image
+        layout.addWidget(self.image_placeholder)
+
+        self.search_button = QPushButton("Recherche")
+        self.search_button.setStyleSheet("background-color: #555; padding: 8px; border-radius: 5px;")
+        self.search_button.clicked.connect(self.process_image)
+        layout.addWidget(self.search_button)
+        
+        panel.setLayout(layout)
+        return panel
+    
+    def load_image(self, event):
+        options = QFileDialog.Option()  # Correctement, pas besoin de .Option()
+        file_path, _ = QFileDialog.getOpenFileName(self, "Choisir une image", "", "Images (*.png *.jpg *.jpeg)", options=options)
+        
+        if file_path:
+            self.image_path = file_path
+            pixmap = QPixmap(file_path).scaled(200, 200, Qt.AspectRatioMode.KeepAspectRatio)
+            self.image_placeholder.setPixmap(pixmap)
+            self.image_placeholder.setText("")
+
+    
+    def process_image(self):
+        if hasattr(self, 'image_path'):
+            image = cv2.imread(self.image_path)
+            hist = self.compute_histogram(image)
+            self.characteristics_label.setText(f"Histogramme extrait:\n{hist}")
+    
+    def compute_histogram(self, image):
+        image_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        hist = cv2.calcHist([image_gray], [0], None, [256], [0, 256])
+        return np.array(hist).flatten()[:5]  # On affiche juste 5 valeurs pour exemple
+
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    window = ImageSearchApp()
+    window.show()
+    sys.exit(app.exec())

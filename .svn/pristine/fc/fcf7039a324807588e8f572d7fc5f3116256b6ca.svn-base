@@ -1,0 +1,16 @@
+from PyQt6.QtWidgets import QFileDialog, QMessageBox
+from PyQt6.QtGui import QPixmap
+import os
+
+class FileManager:
+    def __init__(self):
+        self.last_imported_image = None
+
+    def open_file_dialog(self):
+        """Ouvre un dialogue pour importer une image"""
+        options = QFileDialog.Options()
+        file_path, _ = QFileDialog.getOpenFileName(None, "Importer une Image", "", 
+                                                   "Images (*.png *.jpg *.jpeg)", options=options)
+        if file_path:
+            self.last_imported_image = file_path
+            QMessageBox.information(None, "Importation Réussie", f"Image importée : {os.path.basename(file_path)}")
